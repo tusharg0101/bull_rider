@@ -25,9 +25,8 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-# Define the absolute path to the `temp_audio` folder in the root directory
-ROOT_DIR = os.path.abspath(os.curdir)  # or set a custom root like "/path/to/project/root"
-TEMP_AUDIO_DIR = os.path.join("/" + ROOT_DIR.strip('/backend'), "temp_audio")  # Adjust this based on your folder structure
+ROOT_DIR = os.path.abspath(os.curdir) 
+TEMP_AUDIO_DIR = os.path.join("/" + ROOT_DIR.strip('/backend'), "temp_audio")  
 
 @router.on_event("startup")
 async def startup_event():
