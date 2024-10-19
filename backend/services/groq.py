@@ -3,6 +3,7 @@ import groq
 import json
 from dotenv import load_dotenv
 import base64
+import logging
 load_dotenv()
 
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
@@ -37,4 +38,5 @@ def generate_tutorial(transcript: str, image_file_path: str):
     )
 
     groq_response = chat_completion.choices[0].message.content
+    logging.info(f"Groq response: {groq_response}")
     return groq_response

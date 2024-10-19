@@ -1,8 +1,8 @@
-from fastapi import APIRouter, File, UploadFile, Form, Query, HTTPException
+import os
+from fastapi import APIRouter, File, UploadFile, HTTPException
 from services.deepgram import transcribe_audio, generate_speech
 from services.groq import generate_tutorial
 import logging
-import os
 
 # Set up logging
 log_directory = "logs"
@@ -22,21 +22,41 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+# Define the absolute path to the `temp_audio` folder in the root directory
+ROOT_DIR = os.path.abspath(os.curdir)  # or set a custom root like "/path/to/project/root"
+TEMP_AUDIO_DIR = os.path.join("/" + ROOT_DIR.strip('/backend'), "temp_audio")  # Adjust this based on your folder structure
+
 @router.post("/tutorial")
-async def tutorial(audio_file_path: str = Query(...), image_file_path: str = Query(...)):
-    logger.info(f"Received request with audio_file_path: {audio_file_path}, image_file_path: {image_file_path}")
+async def tutorial(audio_file: UploadFile = File(...), image_file: UploadFile = File(...)):
+    logger.info(f"Received audio file: {audio_file.filename}, image file: {image_file.filename}")
     try:
-        # STEP 1: Transcribe the audio
+        # STEP 1: Define full paths for audio and image files in `temp_audio`
+        audio_file_path = os.path.join(TEMP_AUDIO_DIR, audio_file.filename)
+        image_file_path = os.path.join(TEMP_AUDIO_DIR, image_file.filename)
+
+        logger.debug(f"Saving audio to: {audio_file_path}")
+        logger.debug(f"Saving image to: {image_file_path}")
+
+        # Save the audio and image files
+        with open(audio_file_path, "wb") as audio_out:
+            audio_out.write(await audio_file.read())
+
+        with open(image_file_path, "wb") as image_out:
+            image_out.write(await image_file.read())
+
+        logger.info(f"Files saved: {audio_file_path}, {image_file_path}")
+
+        # STEP 2: Transcribe the audio
         logger.debug(f"Attempting to transcribe audio from: {audio_file_path}")
         transcript = transcribe_audio(audio_file_path)
-        logger.info(f"Audio transcription successful. Transcript: {transcript[:100]}...")  # Log first 100 chars
+        logger.info(f"Audio transcription successful. Transcript: {transcript[:100]}...")
 
-        # STEP 2: Generate the tutorial
+        # STEP 3: Generate the tutorial
         logger.debug("Generating tutorial based on transcript and image")
         tutorial = generate_tutorial(transcript, image_file_path)
-        logger.info(f"Tutorial generation successful. Tutorial: {tutorial[:100]}...")  # Log first 100 chars
+        logger.info(f"Tutorial generation successful. Tutorial: {tutorial[:100]}...")
 
-        # STEP 3: Generate the speech
+        # STEP 4: Generate the speech
         logger.debug("Generating speech from tutorial")
         audio_file_name = generate_speech(tutorial)
         logger.info(f"Speech generation successful. Audio file: {audio_file_name}")

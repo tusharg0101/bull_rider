@@ -9,6 +9,7 @@ from deepgram import (
     SpeakOptions
 )
 import json
+import logging
 
 # Load environment variables from .env file
 load_dotenv()
@@ -43,6 +44,7 @@ def transcribe_audio(audio_file_path):
     # Function to generate speech
 def generate_speech(text):
         deepgram = DeepgramClient(DEEPGRAM_API_KEY)
+        logging.info(f"Generating speech for text: {text}")
 
         # STEP 2: Configure the options (such as model choice, audio configuration, etc.)
         options = SpeakOptions(
@@ -55,5 +57,6 @@ def generate_speech(text):
 
         # STEP 3: Call the save method on the speak property
         response = deepgram.speak.v("1").save(filename, SPEAK_OPTIONS, options)
+        logging.info(f"Speech generation successful. Audio file: {filename}")
         return filename
 

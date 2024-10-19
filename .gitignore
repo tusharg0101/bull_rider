@@ -7,3 +7,5 @@ services/__pycache__
 .DS_Store 
 .vscode/
 audio.wav
+temp_audio
+.venv
