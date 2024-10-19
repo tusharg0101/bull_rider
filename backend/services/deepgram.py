@@ -53,7 +53,10 @@ def generate_speech(text):
             container="wav"
         )
         SPEAK_OPTIONS = {"text": f"{text}"}
-        filename = "output.wav"
+
+        output_folder = os.path.abspath('../temp_audio')
+        os.makedirs(output_folder, exist_ok=True)  # Create the folder if it doesn't exist
+        filename = os.path.join(output_folder, "output.wav")  # Save output.wav to temp_audio
 
         # STEP 3: Call the save method on the speak property
         response = deepgram.speak.v("1").save(filename, SPEAK_OPTIONS, options)
