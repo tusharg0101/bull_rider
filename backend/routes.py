@@ -1,8 +1,11 @@
 import os
-from fastapi import APIRouter, File, UploadFile, HTTPException
+from fastapi import APIRouter, File, UploadFile, HTTPException, Form
 from services.deepgram import transcribe_audio, generate_speech
 from services.groq import generate_tutorial
+from services.db import store_audio, get_audio, get_total_steps, clear_audio
 import logging
+from dotenv import load_dotenv
+import asyncio
 
 # Set up logging
 log_directory = "logs"
@@ -27,41 +30,71 @@ ROOT_DIR = os.path.abspath(os.curdir)  # or set a custom root like "/path/to/pro
 TEMP_AUDIO_DIR = os.path.join("/" + ROOT_DIR.strip('/backend'), "temp_audio")  # Adjust this based on your folder structure
 
 @router.post("/tutorial")
-async def tutorial(audio_file: UploadFile = File(...), image_file: UploadFile = File(...)):
-    logger.info(f"Received audio file: {audio_file.filename}, image file: {image_file.filename}")
+async def tutorial(audio_file: UploadFile = File(None), image_file: UploadFile = File(None)):
+    load_dotenv()
+    tutorial_active = os.getenv('TUTORIAL_ACTIVE', 'FALSE')
+    
     try:
-        # STEP 1: Define full paths for audio and image files in `temp_audio`
-        audio_file_path = os.path.join(TEMP_AUDIO_DIR, audio_file.filename)
-        image_file_path = os.path.join(TEMP_AUDIO_DIR, image_file.filename)
+        if tutorial_active == "FALSE":
+            if not audio_file or not image_file:
+                raise HTTPException(status_code=400, detail="Both audio and image files are required for a new tutorial")
 
-        logger.debug(f"Saving audio to: {audio_file_path}")
-        logger.debug(f"Saving image to: {image_file_path}")
+            logger.info(f"Received audio file: {audio_file.filename}, image file: {image_file.filename}")
 
-        # Save the audio and image files
-        with open(audio_file_path, "wb") as audio_out:
-            audio_out.write(await audio_file.read())
+            # Transcribe the audio
+            transcript = transcribe_audio(audio_file_path)
+            logger.info(f"Audio transcription successful. Transcript: {transcript[:100]}...")
 
-        with open(image_file_path, "wb") as image_out:
-            image_out.write(await image_file.read())
+            # Generate the tutorial
+            steps = generate_tutorial(transcript, image_file_path)
+            logger.info(f"Tutorial generation successful. Number of steps: {len(steps)}")
 
-        logger.info(f"Files saved: {audio_file_path}, {image_file_path}")
+            # Generate and store audio for all steps asynchronously
+            async def store_all_audio():
+                for i, step in enumerate(steps, start=1):
+                    audio_file = generate_speech(step, i)
+                    await store_audio(i, audio_file)
+                    logger.info(f"Generated and stored audio for step {i}")
 
-        # STEP 2: Transcribe the audio
-        logger.debug(f"Attempting to transcribe audio from: {audio_file_path}")
-        transcript = transcribe_audio(audio_file_path)
-        logger.info(f"Audio transcription successful. Transcript: {transcript[:100]}...")
+            asyncio.create_task(store_all_audio())
 
-        # STEP 3: Generate the tutorial
-        logger.debug("Generating tutorial based on transcript and image")
-        tutorial = generate_tutorial(transcript, image_file_path)
-        logger.info(f"Tutorial generation successful. Tutorial: {tutorial[:100]}...")
+            os.environ['TUTORIAL_ACTIVE'] = 'TRUE'
+            os.environ['CURRENT_STEP'] = '1'
 
-        # STEP 4: Generate the speech
-        logger.debug("Generating speech from tutorial")
-        audio_file_name = generate_speech(tutorial)
-        logger.info(f"Speech generation successful. Audio file: {audio_file_name}")
+            # Return the first step's audio
+            first_step_audio = generate_speech(steps[0], 0)
+            return {
+                "step_number": 1,
+                "audio_file": first_step_audio,
+                "is_last_step": len(steps) == 1
+            }
+        
+        else:
+            # This is a subsequent call, get the next step
+            current_step = int(os.getenv('CURRENT_STEP', '1'))
+            next_step = current_step + 1
+            total_steps = await get_total_steps()
 
-        return {"message": "Tutorial received", "audio_file": audio_file_name}
+            if next_step <= total_steps:
+                audio_file = await get_audio(next_step)
+                os.environ['CURRENT_STEP'] = str(next_step)
+                
+                if next_step == total_steps:
+                    os.environ['TUTORIAL_ACTIVE'] = 'FALSE'
+                    os.environ['CURRENT_STEP'] = '1'
+                    asyncio.create_task(clear_audio())
+
+                return {
+                    "step_number": next_step,
+                    "audio_file": audio_file,
+                    "is_last_step": next_step == total_steps
+                }
+            else:
+                os.environ['TUTORIAL_ACTIVE'] = 'FALSE'
+                os.environ['CURRENT_STEP'] = '1'
+                asyncio.create_task(clear_audio())
+                raise HTTPException(status_code=404, detail="No more steps available")
+
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
