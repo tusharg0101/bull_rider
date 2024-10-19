@@ -1,5 +1,6 @@
 import os
-from fastapi import APIRouter, File, UploadFile, HTTPException
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from services.deepgram import transcribe_audio, generate_speech
 from services.groq import generate_tutorial
 import logging
@@ -25,25 +26,25 @@ router = APIRouter()
 ROOT_DIR = os.path.abspath(os.curdir) 
 TEMP_AUDIO_DIR = os.path.join("/" + ROOT_DIR.strip('/backend'), "temp_audio")  
 
+
+# Define a pydantic model to validate incoming requests
+class TutorialRequest(BaseModel):
+    audio_file_path: str
+    image_file_path: str
+
 @router.post("/tutorial")
-async def tutorial(audio_file: UploadFile = File(...), image_file: UploadFile = File(...)):
-    logger.info(f"Received audio file: {audio_file.filename}, image file: {image_file.filename}")
+async def tutorial(request: TutorialRequest):
+    audio_file_path = request.audio_file_path
+    image_file_path = request.image_file_path
+
+    logger.info(f"Received audio file path: {audio_file_path}, image file path: {image_file_path}")
     try:
-        # STEP 1: Define full paths for audio and image files in `temp_audio`
-        audio_file_path = os.path.join(TEMP_AUDIO_DIR, audio_file.filename)
-        image_file_path = os.path.join(TEMP_AUDIO_DIR, image_file.filename)
+        # Check if files exist at the given paths
+        if not os.path.exists(audio_file_path) or not os.path.exists(image_file_path):
+            raise HTTPException(status_code=400, detail="File not found.")
 
-        logger.debug(f"Saving audio to: {audio_file_path}")
-        logger.debug(f"Saving image to: {image_file_path}")
-
-        # Save the audio and image files
-        with open(audio_file_path, "wb") as audio_out:
-            audio_out.write(await audio_file.read())
-
-        with open(image_file_path, "wb") as image_out:
-            image_out.write(await image_file.read())
-
-        logger.info(f"Files saved: {audio_file_path}, {image_file_path}")
+        logger.debug(f"Using audio file at: {audio_file_path}")
+        logger.debug(f"Using image file at: {image_file_path}")
 
         # STEP 2: Transcribe the audio
         logger.debug(f"Attempting to transcribe audio from: {audio_file_path}")

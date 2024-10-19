@@ -1,6 +1,7 @@
 import pyaudio
 import wave
-import pyautogui
+import mss
+import mss.tools
 
 # Record audio using pyaudio
 def record_audio(audio_frames, is_recording):
@@ -39,14 +40,11 @@ def save_audio(filename, audio_frames):
     wf.close()
     print(f"Audio saved as {filename}")
 
-# Capture a screenshot using pyautogui, excluding the menu bar if possible
+# Capture a screenshot using mss
 def capture_screenshot(filename):
     try:
-        # Take a screenshot of the entire visible screen
-        screenshot = pyautogui.screenshot()
-
-        # Save the screenshot in the provided filename
-        screenshot.save(filename)
+        with mss.mss() as sct:
+            sct.shot(output=filename)  # Capture the screen and save it to the specified file
         print(f"Screenshot saved as {filename}")
     except Exception as e:
         print(f"Error during capturing screenshot: {str(e)}")

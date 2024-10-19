@@ -5,12 +5,10 @@ import threading
 from pydub import AudioSegment
 from pydub.playback import play
 from utils import record_audio, save_audio, capture_screenshot
-import time
 
 class BullRiderApp(rumps.App):
     def __init__(self):
         super(BullRiderApp, self).__init__("Bull Rider", icon="./icons/bull_rider.png")
-        # Define the folder for saving files, using absolute path for reliability
         self.output_folder = os.path.abspath('./temp_audio')  
         os.makedirs(self.output_folder, exist_ok=True)  # Ensure folder exists
 
@@ -32,7 +30,6 @@ class BullRiderApp(rumps.App):
         self.env_active = False  # To track if a tutorial session is active
 
     def start_tutorial(self, _):
-        # Start a new tutorial session
         if not self.env_active:
             self.env_active = True
             self.start_recording()
@@ -50,6 +47,7 @@ class BullRiderApp(rumps.App):
                 # Start the audio recording in a new thread
                 self.audio_thread = threading.Thread(target=record_audio, args=(self.audio_frames, self._is_recording))
                 self.audio_thread.start()
+
             except Exception as e:
                 rumps.alert(f"Error starting recording: {str(e)}")
 
@@ -71,12 +69,12 @@ class BullRiderApp(rumps.App):
 
                 # Capture the screenshot and save in the same folder
                 screenshot_path = os.path.join(self.output_folder, 'screenshot.png')
-                capture_screenshot(screenshot_path)  # Ensure the format is consistent with the file extension
+                capture_screenshot(screenshot_path)
 
-                # Now send the files to the FastAPI backend
-                self.upload_files(audio_path, screenshot_path)
+                # Now send the file paths as strings to the FastAPI backend
+                self.upload_file_paths(audio_path, screenshot_path)
 
-                # Once the backend sends the output.wav file, play it and listen for next step
+                # Once the backend sends the output.wav file, start the dynamic listening process
                 self.play_and_listen_again()
 
             except Exception as e:
@@ -84,15 +82,23 @@ class BullRiderApp(rumps.App):
 
     def play_and_listen_again(self):
         try:
-            # Assuming the output file is returned and available
-            output_wav_path = os.path.join(self.output_folder, 'output.wav')
+            current_step = int(os.getenv('CURRENT_STEP', '0'))
+            output_wav_path = os.path.join(self.output_folder, f'output_{current_step}.wav')
             
+            # Play the output.wav file asynchronously
+            audio_thread = threading.Thread(target=self._play_audio_and_listen, args=(output_wav_path,))
+            audio_thread.start()
+
+        except Exception as e:
+            rumps.alert(f"Error during playback or listening: {str(e)}")
+
+    def _play_audio_and_listen(self, output_wav_path):
+        try:
             # Play the output.wav file
             audio = AudioSegment.from_wav(output_wav_path)
             play(audio)
 
-            # After playing, wait for a bit before starting to listen again
-            time.sleep(1)  # You can adjust the delay if needed
+            # Audio has finished playing, now play the listening sound
             self.play_listening_sound()
 
             # Start listening for the next step
@@ -100,35 +106,39 @@ class BullRiderApp(rumps.App):
                 self.start_recording()
 
         except Exception as e:
-            rumps.alert(f"Error during playback or listening: {str(e)}")
+            rumps.alert(f"Error during audio playback: {str(e)}")
 
     def play_listening_sound(self):
         # Play a sound effect to indicate the system is listening
-        listening_sound_path = os.path.join("./audio/", 'listening_sound.wav')
+        listening_sound_path = os.path.abspath('./sounds/listening_sound.wav')
         if os.path.exists(listening_sound_path):
             audio = AudioSegment.from_wav(listening_sound_path)
             play(audio)
+        else:
+            print("Listening sound not found.")
 
-    def upload_files(self, audio_file_path, image_file_path):
-        url = "http://127.0.0.1:8084/tutorial"  # The endpoint to upload files to FastAPI
+    def upload_file_paths(self, audio_file_path, image_file_path):
+        url = "http://127.0.0.1:8084/tutorial"
         try:
-            with open(audio_file_path, 'rb') as audio_file, open(image_file_path, 'rb') as image_file:
-                files = {
-                    'audio_file': ('recorded_audio.wav', audio_file, 'audio/wav'),
-                    'image_file': ('screenshot.png', image_file, 'image/png')  # Correct format
-                }
-                response = requests.post(url, files=files)
-                if response.status_code != 200:
-                    rumps.alert(f"Failed to upload files. Status code: {response.status_code}")
+            # Send the file paths as strings in the request
+            data = {
+                'audio_file_path': audio_file_path,
+                'image_file_path': image_file_path
+            }
+            response = requests.post(url, json=data)
+            if response.status_code == 200:
+                print(f"Files paths sent successfully. Backend response: {response.json()}")
+            else:
+                print(f"Failed to send file paths. Status code: {response.status_code}")
         except Exception as e:
-            rumps.alert(f"Error uploading files: {str(e)}")
+            print(f"Error sending file paths: {str(e)}")
 
     @rumps.clicked("Quit")
     def quit_app(self, _):
         if self.is_recording_flag:
             self.is_recording_flag = False
             if self.audio_thread:
-                self.audio_thread.join()  # Ensure the thread is finished before quitting
+                self.audio_thread.join()
         self.env_active = False
         rumps.quit_application()
 
