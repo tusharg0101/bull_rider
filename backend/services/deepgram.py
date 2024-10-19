@@ -42,7 +42,7 @@ def transcribe_audio(audio_file_path):
         # json_response = json.loads(response)  # Decode the JSON if it's a string
         return response['results']['channels'][0]['alternatives'][0]['transcript']
     # Function to generate speech
-def generate_speech(text):
+def generate_speech(text, step_number):
         deepgram = DeepgramClient(DEEPGRAM_API_KEY)
         logging.info(f"Generating speech for text: {text}")
 
@@ -53,7 +53,7 @@ def generate_speech(text):
             container="wav"
         )
         SPEAK_OPTIONS = {"text": f"{text}"}
-        filename = "output.wav"
+        filename = f"output_{step_number}.wav"
 
         # STEP 3: Call the save method on the speak property
         response = deepgram.speak.v("1").save(filename, SPEAK_OPTIONS, options)

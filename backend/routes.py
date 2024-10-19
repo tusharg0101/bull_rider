@@ -2,7 +2,7 @@ import os
 from fastapi import APIRouter, File, UploadFile, HTTPException, Form
 from services.deepgram import transcribe_audio, generate_speech
 from services.groq import generate_tutorial
-from services.db import store_audio, get_audio, get_total_steps, clear_audio
+from services.db import store_audio, get_audio, get_total_steps, clear_audio, init_db
 import logging
 from dotenv import load_dotenv
 import asyncio
@@ -29,17 +29,28 @@ router = APIRouter()
 ROOT_DIR = os.path.abspath(os.curdir)  # or set a custom root like "/path/to/project/root"
 TEMP_AUDIO_DIR = os.path.join("/" + ROOT_DIR.strip('/backend'), "temp_audio")  # Adjust this based on your folder structure
 
+@router.on_event("startup")
+async def startup_event():
+    await init_db()
+
 @router.post("/tutorial")
-async def tutorial(audio_file: UploadFile = File(None), image_file: UploadFile = File(None)):
+async def tutorial(
+    audio_file_path: str,
+    image_file_path: str
+):
     load_dotenv()
     tutorial_active = os.getenv('TUTORIAL_ACTIVE', 'FALSE')
     
     try:
         if tutorial_active == "FALSE":
-            if not audio_file or not image_file:
-                raise HTTPException(status_code=400, detail="Both audio and image files are required for a new tutorial")
+            if not audio_file_path or not image_file_path:
+                raise HTTPException(status_code=400, detail="Both audio and image file paths are required for a new tutorial")
 
-            logger.info(f"Received audio file: {audio_file.filename}, image file: {image_file.filename}")
+            logger.info(f"Received audio file path: {audio_file_path}, image file path: {image_file_path}")
+
+            # Check if files exist
+            if not os.path.exists(audio_file_path) or not os.path.exists(image_file_path):
+                raise HTTPException(status_code=400, detail="One or both of the specified files do not exist")
 
             # Transcribe the audio
             transcript = transcribe_audio(audio_file_path)
@@ -71,7 +82,7 @@ async def tutorial(audio_file: UploadFile = File(None), image_file: UploadFile =
         
         else:
             # This is a subsequent call, get the next step
-            current_step = int(os.getenv('CURRENT_STEP', '1'))
+            current_step = int(os.getenv('CURRENT_STEP', '0'))
             next_step = current_step + 1
             total_steps = await get_total_steps()
 
@@ -81,7 +92,7 @@ async def tutorial(audio_file: UploadFile = File(None), image_file: UploadFile =
                 
                 if next_step == total_steps:
                     os.environ['TUTORIAL_ACTIVE'] = 'FALSE'
-                    os.environ['CURRENT_STEP'] = '1'
+                    os.environ['CURRENT_STEP'] = '0'
                     asyncio.create_task(clear_audio())
 
                 return {
@@ -91,7 +102,7 @@ async def tutorial(audio_file: UploadFile = File(None), image_file: UploadFile =
                 }
             else:
                 os.environ['TUTORIAL_ACTIVE'] = 'FALSE'
-                os.environ['CURRENT_STEP'] = '1'
+                os.environ['CURRENT_STEP'] = '0'
                 asyncio.create_task(clear_audio())
                 raise HTTPException(status_code=404, detail="No more steps available")
 

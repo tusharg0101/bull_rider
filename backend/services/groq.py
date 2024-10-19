@@ -6,7 +6,6 @@ import logging
 from typing import List
 import asyncio
 from services.deepgram import generate_speech
-from services.db import store_step_audio
 
 load_dotenv()
 
@@ -47,9 +46,3 @@ def generate_tutorial(transcript: str, image_file_path: str) -> List[str]:
     steps = [step.strip() for step in groq_response.split('END_STEP') if step.strip()]
     
     return steps
-
-async def generate_and_store_audio(steps: List[str]):
-    for i, step in enumerate(steps[1:], start=2):  # Start from the second step
-        audio_file = generate_speech(step)
-        await store_step_audio(i, audio_file)
-        logger.info(f"Generated and stored audio for step {i}")
