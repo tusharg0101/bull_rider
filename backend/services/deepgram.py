@@ -42,7 +42,7 @@ def transcribe_audio(audio_file_path):
         # json_response = json.loads(response)  # Decode the JSON if it's a string
         return response['results']['channels'][0]['alternatives'][0]['transcript']
     # Function to generate speech
-def generate_speech(text):
+def generate_speech(text, step_number):
         deepgram = DeepgramClient(DEEPGRAM_API_KEY)
         logging.info(f"Generating speech for text: {text}")
 
@@ -53,11 +53,10 @@ def generate_speech(text):
             container="wav"
         )
         SPEAK_OPTIONS = {"text": f"{text}"}
-
         output_folder = os.path.abspath('../temp_audio')
         os.makedirs(output_folder, exist_ok=True)  # Create the folder if it doesn't exist
-        filename = os.path.join(output_folder, "output.wav")  # Save output.wav to temp_audio
-
+        filename = os.path.join(output_folder, f"output_{step_number}.wav")  # Save output.wav to temp_audio
+        
         # STEP 3: Call the save method on the speak property
         response = deepgram.speak.v("1").save(filename, SPEAK_OPTIONS, options)
         logging.info(f"Speech generation successful. Audio file: {filename}")
