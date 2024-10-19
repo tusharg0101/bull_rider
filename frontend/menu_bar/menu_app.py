@@ -104,7 +104,7 @@ class BullRiderApp(rumps.App):
 
     def play_listening_sound(self):
         # Play a sound effect to indicate the system is listening
-        listening_sound_path = os.path.join(self.output_folder, 'listening_sound.wav')
+        listening_sound_path = os.path.join("./audio/", 'listening_sound.wav')
         if os.path.exists(listening_sound_path):
             audio = AudioSegment.from_wav(listening_sound_path)
             play(audio)

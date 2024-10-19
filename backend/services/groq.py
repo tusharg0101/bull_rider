@@ -23,7 +23,8 @@ def generate_tutorial(transcript: str, image_file_path: str):
                 "content": [
                     {
                         "type": "text",
-                        "text": f"Look at an image of the user's screen. Consider the problem they are facing: {transcript}. Come up with simple, easy to follow, numbered steps that the user can follow to achieve their goal."
+                        # "text": f"Analyze the image of the user's screen. Based on the problem described: {transcript}, provide a clear, step-by-step solution that the user can easily follow to resolve the issue. Ensure the instructions are numbered, concise, and tailored to the user's current screen setup. Focus on making the solution simple and actionable, while avoiding any unnecessary technical jargon."
+                        "text": f"Analyze the image of the user's screen. Based on the problem described: {transcript}, provide a set of concise step that the user can follow from where they are in the image to resolve the issue. Use the image, where should i go from what's on my screen. Keep the response to one line."
                     },
                     {
                         "type": "image_url",
