@@ -166,7 +166,7 @@ async def initiate_transaction(audio_file_path: str, recipient_address: str):
         
         # Extract recipient and amount
         #recipient_name = transaction_details['address']
-        #recipient_address = await get_address_from_name(recipient_name   
+        #recipient_address = await get_address_from_name(recipient_name)   
         logger.info(f"Transaction details String: {transaction_details[-1]}")
         logger.info(f"Transaction details Integer: {int(transaction_details[-1])}")
         amount = int(transaction_details[-1]) * 1000000000 # Convert to Sui units
