@@ -9,3 +9,7 @@ services/__pycache__
 audio.wav
 temp_audio
 .venv
+venv
+node_modules/
+*.log
+
