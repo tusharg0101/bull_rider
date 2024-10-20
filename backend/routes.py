@@ -1,7 +1,8 @@
 import os
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from services.deepgram import transcribe_audio, generate_speech
-from services.groq import generate_tutorial
+from services.groq import generate_tutorial, parse_transaction
+from services.sui import get_sui_client, send_transaction
 import logging
 
 # Set up logging
@@ -65,3 +66,35 @@ async def tutorial(audio_file: UploadFile = File(...), image_file: UploadFile = 
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+@router.post("/initiate-transaction")
+async def initiate_transaction(audio_file_path: str, recipient_address: str):
+    logger.info("Received transaction request")
+    
+    try:
+        # Step 1: Transcribe the audio
+        logger.debug(f"Transcribing audio from file: {audio_file_path}")
+        transcript = transcribe_audio(audio_file_path)
+        logger.info(f"Transcription successful: {transcript[:100]}...")  # Log first 100 chars
+        
+        # Step 2: Parse the transcript for task details (recipient, amount)
+        logger.debug("Parsing transcript for transaction details")
+        transaction_details = parse_transaction(transcript)
+        logger.info(f"Transaction details parsed: {transaction_details}")
+        
+        # Extract recipient and amount
+        recipient_address = transaction_details['address']
+        amount = transaction_details['amount'] * 1000000  # Convert to Sui units
+
+        # Step 3: Execute the transaction on Sui
+        logger.debug(f"Executing transaction on Sui: sending {amount} to {recipient_address}")
+        client = get_sui_client()
+        transaction_digest = send_transaction(client, recipient_address, amount)
+        logger.info(f"Transaction successful: {transaction_digest}")
+
+        return {"message": "Transaction initiated", "transaction_digest": transaction_digest}
+    
+    except Exception as e:
+        logger.error(f"Error during transaction initiation: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Transaction initiation failed: {str(e)}")
