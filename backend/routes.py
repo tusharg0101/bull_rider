@@ -46,41 +46,42 @@ async def tutorial(request: TutorialRequest):
 
 	logger.info(f"Received audio file path: {audio_file_path}, image file path: {image_file_path}")
 	try:
-		# Check if files exist at the given paths
-		if not os.path.exists(audio_file_path) or not os.path.exists(image_file_path):
-			raise HTTPException(status_code=400, detail="File not found.")
+		if True:
+			# Check if files exist at the given paths
+			if not os.path.exists(audio_file_path) or not os.path.exists(image_file_path):
+				raise HTTPException(status_code=400, detail="File not found.")
 
-		logger.debug(f"Using audio file at: {audio_file_path}")
-		logger.debug(f"Using image file at: {image_file_path}")
+			logger.debug(f"Using audio file at: {audio_file_path}")
+			logger.debug(f"Using image file at: {image_file_path}")
 
-		# STEP 2: Transcribe the audio
-		logger.debug(f"Attempting to transcribe audio from: {audio_file_path}")
-		transcript = transcribe_audio(audio_file_path)
-		logger.info(f"Audio transcription successful. Transcript: {transcript[:100]}...")
+			# STEP 2: Transcribe the audio
+			logger.debug(f"Attempting to transcribe audio from: {audio_file_path}")
+			transcript = transcribe_audio(audio_file_path)
+			logger.info(f"Audio transcription successful. Transcript: {transcript[:100]}...")
 
-			# Generate the tutorial
-		steps = generate_tutorial(transcript, image_file_path)
-		logger.info(f"Tutorial generation successful. Number of steps: {len(steps)}")
+				# Generate the tutorial
+			steps = generate_tutorial(transcript, image_file_path)
+			logger.info(f"Tutorial generation successful. Number of steps: {len(steps)}")
 
-		# Generate and store audio for all steps asynchronously
-		async def store_all_audio():
-			for i, step in enumerate(steps, start=1):
-				audio_file = generate_speech(step, i)
-				await store_audio(i, audio_file)
-				logger.info(f"Generated and stored audio for step {i}")
+			# Generate and store audio for all steps asynchronously
+			async def store_all_audio():
+				for i, step in enumerate(steps, start=1):
+					audio_file = generate_speech(step, i)
+					await store_audio(i, audio_file)
+					logger.info(f"Generated and stored audio for step {i}")
 
-		asyncio.create_task(store_all_audio())
+			asyncio.create_task(store_all_audio())
 
-		os.environ['TUTORIAL_ACTIVE'] = 'TRUE'
-		os.environ['CURRENT_STEP'] = '1'
+			os.environ['TUTORIAL_ACTIVE'] = 'TRUE'
+			os.environ['CURRENT_STEP'] = '1'
 
-		# Return the first step's audio
-		first_step_audio = generate_speech(steps[0], 0)
-		return {
-			"step_number": 1,
-			"audio_file": first_step_audio,
-			"is_last_step": len(steps) == 1
-		}
+			# Return the first step's audio
+			first_step_audio = generate_speech(steps[0], 0)
+			return {
+				"step_number": 1,
+				"audio_file": first_step_audio,
+				"is_last_step": len(steps) == 1
+			}
 		
 		else:
 			# This is a subsequent call, get the next step

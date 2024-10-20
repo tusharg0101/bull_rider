@@ -1,0 +1,24 @@
+/* src/pages/Profile.css */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+.profile-container {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.widget {
+    width: 150px;
+    text-align: center;
+    padding: 20px;
+    transition: all 0.3s ease-in-out;
+}
+
+.widget:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+.transaction-history {
+    font-family: 'Montserrat', sans-serif;
+}

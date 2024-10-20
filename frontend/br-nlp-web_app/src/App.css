@@ -1,0 +1,112 @@
+/* App.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #121212;
+  color: white;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+button {
+  transition: all 0.3s ease-in-out;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+}
+
+h2, p {
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.bg-discord-gray {
+  background-color: #2c2f33;
+}
+
+.bg-discord-purple {
+  background-color: #7289da;
+}
+
+.text-discord-blue {
+  color: #7289da;
+}
+
+.text-discord-purple {
+  color: #7289da;
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-text {
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Font */
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Custom Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Shadows and gradient classes */
+.text-gradient {
+  background: linear-gradient(90deg, rgba(68, 85, 255, 1) 0%, rgba(204, 51, 255, 1) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-discord-gray {
+  background-color: #2c2f33;
+}
+
+.bg-discord-purple {
+  background-color: #7289da;
+}
+
+.text-discord-blue {
+  color: #7289da;
+}
+
+.text-discord-purple {
+  color: #7289da;
+}
+
+button {
+  transition: all 0.3s ease-in-out;
+}
+
+button:hover {
+  cursor: pointer;
+}
