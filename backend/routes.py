@@ -5,8 +5,6 @@ from services.deepgram import transcribe_audio, generate_speech
 from services.groq import generate_tutorial, parse_transaction
 from services.sui import get_sui_client, send_transaction
 from services.db import store_audio, get_audio, get_total_steps, clear_audio, init_db, init_name_address, get_address_from_name, set_name_address
-from services.groq import generate_tutorial, parse_transaction
-from services.sui import get_sui_client, send_transaction
 import logging
 from dotenv import load_dotenv
 import asyncio
@@ -49,7 +47,6 @@ class CurrentStepRequest(BaseModel):
 async def startup_event():
 	await init_db()
 	await init_name_address()
-	await set_name_address('rohan', '0xe10d1593882b3560c5d130f9d166d6b8cf2cbb5a3bdda211c45d1ca6b464a9d5')
 	
 
 # Global variables to store the tutorial state and current step
