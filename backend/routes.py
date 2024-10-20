@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from services.deepgram import transcribe_audio, generate_speech
 from services.groq import generate_tutorial, parse_transaction
 from services.sui import get_sui_client, send_transaction
-from services.db import store_audio, get_audio, get_total_steps, clear_audio, init_db
+from services.db import store_audio, get_audio, get_total_steps, clear_audio, init_db, init_name_address, get_address_from_name
 from services.groq import generate_tutorial, parse_transaction
 from services.sui import get_sui_client, send_transaction
 import logging
@@ -47,6 +47,7 @@ class CurrentStepRequest(BaseModel):
 @router.on_event("startup")
 async def startup_event():
 	await init_db()
+	await init_name_address()
 
 # Global variables to store the tutorial state and current step
 tutorial_active = False
@@ -197,7 +198,8 @@ async def initiate_transaction(audio_file_path: str, recipient_address: str):
         logger.info(f"Transaction details parsed: {transaction_details}")
         
         # Extract recipient and amount
-        recipient_address = transaction_details['address']
+        recipient_name = transaction_details['address']
+        recipient_address = await get_address_from_name(recipient_name)
         amount = transaction_details['amount'] * 1000000  # Convert to Sui units
 
         # Step 3: Execute the transaction on Sui
