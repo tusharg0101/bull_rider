@@ -50,18 +50,12 @@ def capture_screenshot(filename):
             
         image = Image.open(filename)
 
-        original_size = os.path.getsize(filename)
-        print("Original Size: ", original_size)
-
         width, height = image.size
         new_size = (width//4, height//4)
         resized_image = image.resize(new_size)
 
         resized_image.save(filename, optimize=True, quality=50)
 
-        compressed_size = os.path.getsize(filename)
-
-        print("tushi Compressed Size: ", compressed_size)
         print(f"Screenshot saved as {filename}")
     except Exception as e:
         print(f"Error during capturing screenshot: {str(e)}")

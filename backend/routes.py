@@ -44,7 +44,7 @@ class CurrentStepRequest(BaseModel):
 @router.on_event("startup")
 async def startup_event():
 	await init_db()
-	await init_rag()
+	await init_rag()  # This should now work correctly
 
 # Global variables to store the tutorial state and current step
 tutorial_active = False
