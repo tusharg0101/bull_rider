@@ -6,6 +6,7 @@ import base64
 import requests
 from io import BytesIO
 from PIL import Image
+from scrape_and_rag import retrieve_context
 
 logger = logging.getLogger(__name__)
 
@@ -20,9 +21,11 @@ def encode_image(img):
     return encoded_string
 
 def generate_tutorial(transcript: str, image_file_path: str) -> List[str]:
-
+    relevant_context = retrieve_context(transcript)
+    
     prompt = f"""Analyze the image of the user's screen. 
     Based on the problem described by the user: {transcript}, 
+    and considering the following context: {relevant_context}, 
     provide a clear, step-by-step solution that the user can easily follow to resolve the issue. 
     Ensure the instructions are numbered, concise, and tailored to the user's current screen setup. 
     Focus on making the solution simple and actionable, while avoiding any unnecessary technical jargon. 
