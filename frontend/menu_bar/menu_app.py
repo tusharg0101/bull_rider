@@ -5,6 +5,7 @@ import threading
 from pydub import AudioSegment
 from pydub.playback import play
 from utils import record_audio, save_audio, capture_screenshot
+from pydantic import BaseModel
 
 class BullRiderApp(rumps.App):
     def __init__(self):
@@ -39,7 +40,11 @@ class BullRiderApp(rumps.App):
     def set_tutorial_state(self, state):
         try:
             response = requests.post("http://127.0.0.1:8084/tutorial_state", json={"state": state})
-            return response.json()["tutorial_active"]
+            if response.status_code == 200:
+                return response.json()["tutorial_active"]
+            else:
+                print(f"Failed to set tutorial state. Status code: {response.status_code}")
+                return False
         except Exception as e:
             print(f"Error setting tutorial state: {str(e)}")
             return False
@@ -55,16 +60,19 @@ class BullRiderApp(rumps.App):
     def set_current_step(self, step):
         try:
             response = requests.post("http://127.0.0.1:8084/current_step", json={"step": step})
-            return response.json()["current_step"]
+            if response.status_code == 200:
+                return response.json()["current_step"]
+            else:
+                print(f"Failed to set current step. Status code: {response.status_code}")
+                return 0
         except Exception as e:
             print(f"Error setting current step: {str(e)}")
             return 0
 
     def start_tutorial(self, _):
-        if not self.get_tutorial_state():
-            self.set_tutorial_state(True)
-            self.set_current_step(0)
-            self.start_recording()
+        self.set_tutorial_state(True)
+        self.set_current_step(0)
+        self.start_recording()
 
     def start_recording(self):
         if not self.is_recording_flag:
@@ -115,6 +123,7 @@ class BullRiderApp(rumps.App):
     def play_and_listen_again(self):
         try:
             current_step = self.get_current_step()
+            print(f"Current step tushi: {current_step}")
             output_wav_path = os.path.join(self.output_folder, f'output_{current_step}.wav')
             
             # Play the output.wav file asynchronously
@@ -133,8 +142,10 @@ class BullRiderApp(rumps.App):
             # Audio has finished playing, now play the listening sound
             self.play_listening_sound()
 
+            print(f"Tutorial state tushi: {self.get_tutorial_state()}")
+
             # Start listening for the next step
-            if self.get_tutorial_state():
+            if not self.get_tutorial_state():
                 self.start_recording()
             else:
                 self.set_tutorial_state(False)
@@ -145,7 +156,7 @@ class BullRiderApp(rumps.App):
 
     def play_listening_sound(self):
         # Play a sound effect to indicate the system is listening
-        listening_sound_path = os.path.abspath('./sounds/listening_sound.wav')
+        listening_sound_path = os.path.abspath('./audio/listening_sound.wav')
         if os.path.exists(listening_sound_path):
             audio = AudioSegment.from_wav(listening_sound_path)
             play(audio)

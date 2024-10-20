@@ -40,7 +40,6 @@ def generate_tutorial(transcript: str, image_file_path: str) -> List[str]:
     )
 
     groq_response = chat_completion.choices[0].message.content
-    logger.info(f"Groq response: {groq_response}")
     
     # Split the response into steps
     steps = [step.strip() for step in groq_response.split('END_STEP') if step.strip()]

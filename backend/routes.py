@@ -35,6 +35,12 @@ class TutorialRequest(BaseModel):
 	audio_file_path: str
 	image_file_path: str
 
+class TutorialStateRequest(BaseModel):
+	state: bool
+
+class CurrentStepRequest(BaseModel):
+	step: int
+
 @router.on_event("startup")
 async def startup_event():
 	await init_db()
@@ -48,9 +54,9 @@ async def get_tutorial_state():
 	return {"tutorial_active": tutorial_active}
 
 @router.post("/tutorial_state")
-async def set_tutorial_state(state: bool):
+async def set_tutorial_state(request: TutorialStateRequest):
 	global tutorial_active
-	tutorial_active = state
+	tutorial_active = request.state
 	return {"tutorial_active": tutorial_active}
 
 @router.get("/current_step")
@@ -58,9 +64,9 @@ async def get_current_step():
 	return {"current_step": current_step}
 
 @router.post("/current_step")
-async def set_current_step(step: int):
+async def set_current_step(request: CurrentStepRequest):
 	global current_step
-	current_step = step
+	current_step = request.step
 	return {"current_step": current_step}
 
 @router.post("/tutorial")
@@ -94,8 +100,6 @@ async def tutorial(request: TutorialRequest):
 					await store_audio(i, audio_file)
 					logger.info(f"Generated and stored audio for step {i}")
 
-			
-
 			tutorial_active = False
 			current_step = 0
 
@@ -113,6 +117,8 @@ async def tutorial(request: TutorialRequest):
 			# This is a subsequent call, get the next step
 			next_step = current_step + 1
 			total_steps = await get_total_steps()
+
+			logger.info(f"Current step: {current_step}, Next step: {next_step}, Total steps: {total_steps}")
 
 			if next_step <= total_steps:
 				audio_file = await get_audio(next_step)

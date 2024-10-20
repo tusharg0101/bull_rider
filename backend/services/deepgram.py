@@ -21,8 +21,6 @@ DEEPGRAM_API_KEY = os.getenv('DEEPGRAM_API_KEY')
 def transcribe_audio(audio_file_path):
         deepgram = DeepgramClient(DEEPGRAM_API_KEY)
 
-        print("i am here")
-
         with open(audio_file_path, "rb") as file:
             buffer_data = file.read()
 
