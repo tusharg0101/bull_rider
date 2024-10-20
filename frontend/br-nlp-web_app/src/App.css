@@ -1,38 +1,78 @@
 /* App.css */
 
+/* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap');
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   background-color: #121212;
   color: white;
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
-button {
-  transition: all 0.3s ease-in-out;
+/* Ensure main container takes full viewport height */
+.main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
-button:hover {
-  cursor: pointer;
+/* Header styles */
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 50;
+  background-color: transparent;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
 }
 
-a {
-  text-decoration: none;
+.header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
 }
 
-h2, p {
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
-}
-
-.bg-discord-gray {
+/* Footer styles */
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 50;
   background-color: #2c2f33;
 }
 
-.bg-discord-purple {
-  background-color: #7289da;
+/* Styling for hero section and other pages */
+.hero-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Prevent scroll */
+html, body {
+  overflow: hidden;
+}
+
+/* Shadows and gradient classes */
+.text-gradient {
+  background: linear-gradient(90deg, rgba(68, 85, 255, 1) 0%, rgba(204, 51, 255, 1) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .text-discord-blue {
@@ -43,28 +83,17 @@ h2, p {
   color: #7289da;
 }
 
-/* Custom animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Button and hover effects */
+button {
+  transition: all 0.3s ease-in-out;
 }
 
-.hero-text {
-  animation: fadeIn 1s ease-in-out;
+button:hover {
+  cursor: pointer;
+  transform: scale(1.05);
 }
 
-/* Font */
-body {
-  font-family: 'Poppins', sans-serif;
-}
-
-/* Custom Animations */
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -78,35 +107,4 @@ body {
 
 .animate-fade-in {
   animation: fadeIn 1s ease-in-out;
-}
-
-/* Shadows and gradient classes */
-.text-gradient {
-  background: linear-gradient(90deg, rgba(68, 85, 255, 1) 0%, rgba(204, 51, 255, 1) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.bg-discord-gray {
-  background-color: #2c2f33;
-}
-
-.bg-discord-purple {
-  background-color: #7289da;
-}
-
-.text-discord-blue {
-  color: #7289da;
-}
-
-.text-discord-purple {
-  color: #7289da;
-}
-
-button {
-  transition: all 0.3s ease-in-out;
-}
-
-button:hover {
-  cursor: pointer;
 }

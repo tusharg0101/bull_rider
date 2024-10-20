@@ -78,7 +78,7 @@ const SignUp = () => {
       {/* Header with logo */}
       <div className="absolute top-4 left-4 flex items-center space-x-2">
         <img
-          src="/assets/icons/bull_icon.png"
+          src="/bull_rider.png"
           alt="Bull Rider Logo"
           className="h-10 w-10 mr-2"
         />

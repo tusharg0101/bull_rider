@@ -1,4 +1,4 @@
-// HeroSection.js
+// src/components/HeroSection.js
 
 import React from "react";
 import { Link } from "react-router-dom";
@@ -9,9 +9,11 @@ const HeroSection = () => {
       id="hero"
       className="h-screen flex flex-col items-center justify-center bg-gradient-to-b from-black via-gray-900 to-black text-white relative overflow-hidden"
     >
-      {/* Decorative gradient circles */}
-      <div className="absolute -top-16 left-16 w-72 h-72 bg-gradient-to-r from-blue-500 to-purple-600 opacity-40 rounded-full animate-pulse"></div>
-      <div className="absolute bottom-0 right-20 w-96 h-96 bg-gradient-to-r from-purple-500 to-blue-500 opacity-30 rounded-full animate-pulse"></div>
+      {/* Decorative diffused gradient circles */}
+      <div className="absolute -top-20 left-10 w-96 h-96 bg-gradient-to-r from-blue-500 to-purple-600 opacity-30 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-32 w-80 h-80 bg-gradient-to-r from-purple-500 to-pink-500 opacity-25 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute top-20 right-10 w-64 h-64 bg-gradient-to-r from-blue-500 to-green-400 opacity-20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute -bottom-32 left-32 w-72 h-72 bg-gradient-to-r from-pink-500 to-orange-400 opacity-30 rounded-full blur-3xl animate-pulse"></div>
 
       <div className="text-center z-10">
         <h2 className="text-7xl font-extrabold text-transparent bg-clip-text text-gradient mb-4 tracking-wide drop-shadow-lg animate-fade-in">

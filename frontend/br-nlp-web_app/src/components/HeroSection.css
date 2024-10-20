@@ -1,0 +1,23 @@
+/* src/components/HeroSection.css */
+
+/* Animation keyframe for pulsing effect */
+@keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.3;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.4;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0.3;
+    }
+  }
+  
+  /* Apply the pulse animation to the bubbles */
+  .animate-pulse {
+    animation: pulse 8s infinite;
+  }
+  
