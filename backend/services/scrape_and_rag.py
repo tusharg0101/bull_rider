@@ -32,7 +32,7 @@ def build_faiss_index(docs):
     # Add embeddings to the index
     faiss_index.add(np.array(embeddings))
 
-def retrieve_context(transcript: str, k: int = 3):
+def retrieve_context(transcript: str, k: int = 5):
     global faiss_index, documents
     if faiss_index is None or not documents:
         logger.error("FAISS index or documents not initialized")
@@ -45,8 +45,6 @@ async def init_rag():
     global documents
     url = "https://github.com/MystenLabs/mysten-app-docs/blob/main/mysten-sui-wallet.md"
     doc_content = scrape_github_doc(url)
-
-    logger.info(f"Scraped content tushi: {doc_content}")
     
     if doc_content:
         documents = doc_content.splitlines()  # Split the scraped content into lines for processing

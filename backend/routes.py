@@ -2,7 +2,7 @@ import os
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from services.deepgram import transcribe_audio, generate_speech
-from services.groq import generate_tutorial, parse_transaction
+from services.groq import parse_transaction
 from services.sui import get_sui_client, send_transaction
 from services.db import store_audio, get_audio, get_total_steps, clear_audio, init_db, init_name_address, get_address_from_name, set_name_address
 import logging
@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 import asyncio
 import json
 from services.scrape_and_rag import init_rag
+from services.hyperbolic import generate_tutorial
 
 # Set up logging
 log_directory = "logs"

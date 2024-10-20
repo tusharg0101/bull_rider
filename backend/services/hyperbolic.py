@@ -35,7 +35,7 @@ def generate_tutorial(transcript: str, image_file_path: str) -> List[str]:
     provide a clear, step-by-step solution that the user can easily follow to resolve the issue. 
     Ensure the instructions are numbered, concise, and tailored to the user's current screen setup. 
     Focus on making the solution simple and actionable, while avoiding any unnecessary technical jargon. 
-    Do not include any other text. Only return the steps. At the end of each step, include a codeword 'END_STEP' 
+    Do not include any other text. Only return the steps. At the end of each step and before the next step, include a codeword 'END_STEP' 
     so I can split the steps later."""
         
     img = Image.open(image_file_path)
