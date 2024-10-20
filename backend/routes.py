@@ -2,7 +2,7 @@ import os
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from services.deepgram import transcribe_audio, generate_speech
-from services.groq import generate_tutorial
+from services.hyperbolic import generate_tutorial
 from services.db import store_audio, get_audio, get_total_steps, clear_audio, init_db
 import logging
 from dotenv import load_dotenv
