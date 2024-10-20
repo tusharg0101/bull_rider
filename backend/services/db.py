@@ -1,6 +1,5 @@
 import os
 import aiosqlite
-import asyncio
 from typing import List
 
 DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'tutorial.db')

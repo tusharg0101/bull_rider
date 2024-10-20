@@ -21,8 +21,6 @@ DEEPGRAM_API_KEY = os.getenv('DEEPGRAM_API_KEY')
 def transcribe_audio(audio_file_path):
         deepgram = DeepgramClient(DEEPGRAM_API_KEY)
 
-        print("i am here")
-
         with open(audio_file_path, "rb") as file:
             buffer_data = file.read()
 
@@ -43,22 +41,21 @@ def transcribe_audio(audio_file_path):
         return response['results']['channels'][0]['alternatives'][0]['transcript']
     # Function to generate speech
 def generate_speech(text, step_number):
-        deepgram = DeepgramClient(DEEPGRAM_API_KEY)
-        logging.info(f"Generating speech for text: {text}")
+    deepgram = DeepgramClient(DEEPGRAM_API_KEY)
+    logging.info(f"Generating speech for text: {text}")
 
-        # STEP 2: Configure the options (such as model choice, audio configuration, etc.)
-        options = SpeakOptions(
-            model="aura-asteria-en",
-            encoding="linear16",
-            container="wav"
-        )
-        SPEAK_OPTIONS = {"text": f"{text}"}
-        output_folder = os.path.abspath('../temp_audio')
-        os.makedirs(output_folder, exist_ok=True)  # Create the folder if it doesn't exist
-        filename = os.path.join(output_folder, f"output_{step_number}.wav")  # Save output.wav to temp_audio
-        
-        # STEP 3: Call the save method on the speak property
-        response = deepgram.speak.v("1").save(filename, SPEAK_OPTIONS, options)
-        logging.info(f"Speech generation successful. Audio file: {filename}")
-        return filename
-
+    # STEP 2: Configure the options (such as model choice, audio configuration, etc.)
+    options = SpeakOptions(
+        model="aura-asteria-en",
+        encoding="linear16",
+        container="wav"
+    )
+    SPEAK_OPTIONS = {"text": f"{text}"}
+    output_folder = os.path.abspath('../temp_audio')
+    os.makedirs(output_folder, exist_ok=True)  # Create the folder if it doesn't exist
+    filename = os.path.join(output_folder, f"output_{step_number}.wav")  # Save output.wav to temp_audio
+    
+    # STEP 3: Call the save method on the speak property
+    response = deepgram.speak.v("1").save(filename, SPEAK_OPTIONS, options)
+    logging.info(f"Speech generation successful. Audio file: {filename}")
+    return filename
