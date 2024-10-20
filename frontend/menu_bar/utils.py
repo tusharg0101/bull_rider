@@ -2,6 +2,8 @@ import pyaudio
 import wave
 import mss
 import mss.tools
+from PIL import Image
+import os
 
 # Record audio using pyaudio
 def record_audio(audio_frames, is_recording):
@@ -45,6 +47,21 @@ def capture_screenshot(filename):
     try:
         with mss.mss() as sct:
             sct.shot(output=filename)  # Capture the screen and save it to the specified file
+            
+        image = Image.open(filename)
+
+        original_size = os.path.getsize(filename)
+        print("Original Size: ", original_size)
+
+        width, height = image.size
+        new_size = (width//4, height//4)
+        resized_image = image.resize(new_size)
+
+        resized_image.save(filename, optimize=True, quality=50)
+
+        compressed_size = os.path.getsize(filename)
+
+        print("tushi Compressed Size: ", compressed_size)
         print(f"Screenshot saved as {filename}")
     except Exception as e:
         print(f"Error during capturing screenshot: {str(e)}")

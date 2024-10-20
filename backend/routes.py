@@ -36,7 +36,7 @@ class TutorialRequest(BaseModel):
 	image_file_path: str
 
 class TutorialStateRequest(BaseModel):
-	state: bool
+    	state: bool
 
 class CurrentStepRequest(BaseModel):
 	step: int
@@ -117,8 +117,6 @@ async def tutorial(request: TutorialRequest):
 			# This is a subsequent call, get the next step
 			next_step = current_step + 1
 			total_steps = await get_total_steps()
-
-			logger.info(f"Current step: {current_step}, Next step: {next_step}, Total steps: {total_steps}")
 
 			if next_step <= total_steps:
 				audio_file = await get_audio(next_step)

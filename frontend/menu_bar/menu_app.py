@@ -123,7 +123,6 @@ class BullRiderApp(rumps.App):
     def play_and_listen_again(self):
         try:
             current_step = self.get_current_step()
-            print(f"Current step tushi: {current_step}")
             output_wav_path = os.path.join(self.output_folder, f'output_{current_step}.wav')
             
             # Play the output.wav file asynchronously
@@ -141,8 +140,6 @@ class BullRiderApp(rumps.App):
 
             # Audio has finished playing, now play the listening sound
             self.play_listening_sound()
-
-            print(f"Tutorial state tushi: {self.get_tutorial_state()}")
 
             # Start listening for the next step
             if not self.get_tutorial_state():
