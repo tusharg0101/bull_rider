@@ -14,7 +14,7 @@ function AppWrapper() {
   const location = useLocation();
   
   // Hide header on specific pages
-  const hideHeaderPages = ["/profile", "/contacts"];
+  const hideHeaderPages = ["/profile", "/contacts", "/login"];
   const isHeaderVisible = !hideHeaderPages.includes(location.pathname);
 
   return (
@@ -26,7 +26,7 @@ function AppWrapper() {
         <Routes>
           <Route path="/" element={<HeroSection />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/login" element={<LandingPage />} />
+          <Route path="/login" element={<LandingPage />} /> {/* Login page */}
           <Route path="/profile" element={<Profile />} />
           <Route path="/contacts" element={<Contacts />} />
         </Routes>

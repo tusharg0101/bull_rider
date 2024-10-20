@@ -14,7 +14,7 @@ const HeroSection = () => {
       <div className="absolute bottom-0 right-20 w-96 h-96 bg-gradient-to-r from-purple-500 to-blue-500 opacity-30 rounded-full animate-pulse"></div>
 
       <div className="text-center z-10">
-        <h2 className="text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500 mb-4 tracking-wide drop-shadow-lg animate-fade-in">
+        <h2 className="text-7xl font-extrabold text-transparent bg-clip-text text-gradient mb-4 tracking-wide drop-shadow-lg animate-fade-in">
           Welcome to Bull Rider
         </h2>
         <p className="text-xl mb-8 text-gray-300 animate-fade-in">

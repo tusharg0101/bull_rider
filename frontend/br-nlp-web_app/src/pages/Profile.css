@@ -3,22 +3,47 @@
 /* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
 
-.profile-container {
+.font-cool {
     font-family: 'Montserrat', sans-serif;
 }
 
-.widget {
-    width: 150px;
-    text-align: center;
-    padding: 20px;
+/* Background gradient for the profile page */
+.bg-animated-gradient {
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+    background-size: 200% 200%;
+    animation: gradientAnimation 15s ease infinite;
+}
+
+/* Smooth animation for background */
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Button styles */
+button {
+    font-weight: bold;
     transition: all 0.3s ease-in-out;
 }
 
-.widget:hover {
+button:hover {
     transform: scale(1.05);
-    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-.transaction-history {
-    font-family: 'Montserrat', sans-serif;
+/* Fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 1s ease-in-out;
 }
