@@ -50,7 +50,7 @@ def parse_transaction(transcript: str):
         messages=[
             {
                 "role": "user",
-                "content": f"From the following transcript, extract the task, recipient address, and amount: {transcript}"
+                "content": f"From the following {transcript}, extract the recipient's name (which is typically a person's name), and the amount of tokens. If you encounter the words 'token', 'tokens', 'coin', or 'coins', they all mean the same thing. Additionally, convert any alphanumeric characters such as 'one', 'two', 'three', etc., into their respective numbers. Ensure that the amount is an integer and appears at the very end of the response. Format the response in the following way: 'Recipient: [recipient's name], Amount: [amount]'. Don't include any ' in the response. The amount must be the last character of the response so that it can be easily extracted by accessing the last character of the response."
             }
         ],
         model="llama-3.2-11b"
