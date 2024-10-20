@@ -149,7 +149,7 @@ async def tutorial(request: TutorialRequest):
     
 
 @router.post("/initiate-transaction")
-async def initiate_transaction(audio_file_path: str, recipient_address: str):
+async def initiate_transaction(audio_file_path: str):
     logger.info("Received transaction request")
     
     try:
