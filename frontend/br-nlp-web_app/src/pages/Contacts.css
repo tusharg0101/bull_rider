@@ -1,0 +1,30 @@
+/* src/pages/Contacts.css */
+.contacts-container {
+    animation: fadeIn 1s ease-in-out;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #4b5563;
+  }
+  
+  tr:hover {
+    background-color: #1f2937;
+  }
+  
+  button {
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  

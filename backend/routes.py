@@ -75,6 +75,30 @@ async def set_current_step(request: CurrentStepRequest):
 	current_step = request.step
 	return {"current_step": current_step}
 
+# Global variables to store the tutorial state and current step
+tutorial_active = False
+current_step = 0
+
+@router.get("/tutorial_state")
+async def get_tutorial_state():
+	return {"tutorial_active": tutorial_active}
+
+@router.post("/tutorial_state")
+async def set_tutorial_state(request: TutorialStateRequest):
+	global tutorial_active
+	tutorial_active = request.state
+	return {"tutorial_active": tutorial_active}
+
+@router.get("/current_step")
+async def get_current_step():
+	return {"current_step": current_step}
+
+@router.post("/current_step")
+async def set_current_step(request: CurrentStepRequest):
+	global current_step
+	current_step = request.step
+	return {"current_step": current_step}
+
 @router.post("/tutorial")
 async def tutorial(request: TutorialRequest):
 	global tutorial_active, current_step
