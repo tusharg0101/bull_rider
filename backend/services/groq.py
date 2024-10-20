@@ -40,8 +40,24 @@ def generate_tutorial(transcript: str, image_file_path: str) -> List[str]:
     )
 
     groq_response = chat_completion.choices[0].message.content
+    logging.info(f"Groq response: {groq_response}")
+    return groq_response
+
+def parse_transaction(transcript: str):
+    groq_client = groq.Client(api_key=GROQ_API_KEY)
+
+    chat_completion = groq_client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": f"From the following transcript, extract the task, recipient address, and amount: {transcript}"
+            }
+        ],
+        model="llama-3.2-11b"
+    )
+
+    groq_response = chat_completion.choices[0].message.content
+    logging.info(f"Transcript: {transcript}")
+    logging.info(f"Groq response: {groq_response}")
+    return groq_response  # Should be something like: {"task": "send", "address": "0x...", "amount": 100}
     
-    # Split the response into steps
-    steps = [step.strip() for step in groq_response.split('END_STEP') if step.strip()]
-    
-    return steps
