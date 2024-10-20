@@ -84,7 +84,9 @@ const LandingPage = () => {
         <p className="text-center text-gray-300 mb-6">
           Please log in to continue.
         </p>
-        <h1 className="text-4xl font-bold text-center mb-8 text-discord-purple">Sign Up</h1>
+        <h1 className="text-4xl font-bold text-center mb-8 text-discord-purple">
+          Sign In
+        </h1>
         <div className="mb-6">
           <input
             type="password"
