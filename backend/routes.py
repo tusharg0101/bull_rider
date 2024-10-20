@@ -4,12 +4,13 @@ from pydantic import BaseModel
 from services.deepgram import transcribe_audio, generate_speech
 from services.groq import generate_tutorial, parse_transaction
 from services.sui import get_sui_client, send_transaction
-from services.db import store_audio, get_audio, get_total_steps, clear_audio, init_db, init_name_address, get_address_from_name
+from services.db import store_audio, get_audio, get_total_steps, clear_audio, init_db, init_name_address, get_address_from_name, set_name_address
 from services.groq import generate_tutorial, parse_transaction
 from services.sui import get_sui_client, send_transaction
 import logging
 from dotenv import load_dotenv
 import asyncio
+import json
 
 # Set up logging
 log_directory = "logs"
@@ -48,6 +49,8 @@ class CurrentStepRequest(BaseModel):
 async def startup_event():
 	await init_db()
 	await init_name_address()
+	await set_name_address('rohan', '0xe10d1593882b3560c5d130f9d166d6b8cf2cbb5a3bdda211c45d1ca6b464a9d5')
+	
 
 # Global variables to store the tutorial state and current step
 tutorial_active = False
@@ -146,40 +149,6 @@ async def tutorial(request: TutorialRequest):
 	except Exception as e:
 		logger.error(f"An error occurred: {str(e)}", exc_info=True)
 		raise HTTPException(status_code=500, detail=str(e))
-
-@router.post("/initiate-transaction")
-async def initiate_transaction(audio_file_path: str, recipient_address: str):
-    logger.info("Received transaction request")
-    
-    try:
-        # Step 1: Transcribe the audio
-        logger.debug(f"Transcribing audio from file: {audio_file_path}")
-        transcript = transcribe_audio(audio_file_path)
-        logger.info(f"Transcription successful: {transcript[:100]}...")  # Log first 100 chars
-        
-        # Step 2: Parse the transcript for task details (recipient, amount)
-        logger.debug("Parsing transcript for transaction details")
-        transaction_details = parse_transaction(transcript)
-        logger.info(f"Transaction details parsed: {transaction_details}")
-        
-        # Extract recipient and amount
-        recipient_address = transaction_details['address']
-        amount = transaction_details['amount'] * 1000000  # Convert to Sui units
-
-        # Step 3: Execute the transaction on Sui
-        logger.debug(f"Executing transaction on Sui: sending {amount} to {recipient_address}")
-        client = get_sui_client()
-        transaction_digest = send_transaction(client, recipient_address, amount)
-        logger.info(f"Transaction successful: {transaction_digest}")
-
-        return {"message": "Transaction initiated", "transaction_digest": transaction_digest}
-    
-    except Exception as e:
-        logger.error(f"Error during transaction initiation: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Transaction initiation failed: {str(e)}")
-
-        logger.error(f"An error occurred: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
     
 
 @router.post("/initiate-transaction")
@@ -195,17 +164,22 @@ async def initiate_transaction(audio_file_path: str, recipient_address: str):
         # Step 2: Parse the transcript for task details (recipient, amount)
         logger.debug("Parsing transcript for transaction details")
         transaction_details = parse_transaction(transcript)
+        #transaction_details = json.loads(transaction_details)
         logger.info(f"Transaction details parsed: {transaction_details}")
         
         # Extract recipient and amount
-        recipient_name = transaction_details['address']
-        recipient_address = await get_address_from_name(recipient_name)
-        amount = transaction_details['amount'] * 1000000  # Convert to Sui units
+        #recipient_name = transaction_details['address']
+        #recipient_address = await get_address_from_name(recipient_name   
+        logger.info(f"Transaction details String: {transaction_details[-1]}")
+        logger.info(f"Transaction details Integer: {int(transaction_details[-1])}")
+        amount = int(transaction_details[-1]) * 1000000000 # Convert to Sui units
 
         # Step 3: Execute the transaction on Sui
         logger.debug(f"Executing transaction on Sui: sending {amount} to {recipient_address}")
-        client = get_sui_client()
-        transaction_digest = send_transaction(client, recipient_address, amount)
+        client = await get_sui_client()
+        #logger.debug(f"address of client{client['config']['addresses']}")
+        logger.info("Got client")
+        transaction_digest = await send_transaction(client, recipient_address, amount)
         logger.info(f"Transaction successful: {transaction_digest}")
 
         return {"message": "Transaction initiated", "transaction_digest": transaction_digest}
