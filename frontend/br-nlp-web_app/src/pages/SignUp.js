@@ -1,15 +1,16 @@
 // SignUp.js
 
 import React, { useState, useRef } from "react";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import RecordRTC from "recordrtc";
 
 const SignUp = () => {
   const [password, setPassword] = useState("");
-  const [audioFiles, setAudioFiles] = useState([]);
   const [promptIndex, setPromptIndex] = useState(0);
   const [recording, setRecording] = useState(false);
+  const [audioBlobs, setAudioBlobs] = useState([]);
   const recorderRef = useRef(null);
+  const navigate = useNavigate(); // Call useNavigate at the top level
 
   const prompts = [
     "Say 'Log me in' for the first time",
@@ -35,41 +36,49 @@ const SignUp = () => {
     recorderRef.current.startRecording();
   };
 
+  // Stop recording and store the audio blob
   const stopRecording = async () => {
-    recorderRef.current.stopRecording(async () => {
+    recorderRef.current.stopRecording(() => {
       const blob = recorderRef.current.getBlob();
-      setAudioFiles((prevFiles) => [...prevFiles, blob]);
+      setAudioBlobs((prevBlobs) => [...prevBlobs, blob]);
       setPromptIndex((prevIndex) => prevIndex + 1);
       setRecording(false);
     });
   };
 
   const handleSubmit = async () => {
-    if (audioFiles.length < 3) {
+    if (audioBlobs.length < 3) {
       alert("Please complete all three voice recordings.");
       return;
     }
 
+    // Create a FormData object to send the password and audio files
     const formData = new FormData();
     formData.append("password", password);
-    audioFiles.forEach((file, index) => {
-      formData.append(`audio_${index + 1}`, file, `audio_${index + 1}.wav`);
+    audioBlobs.forEach((blob, index) => {
+      formData.append(`voice_${index + 1}`, blob, `voice_${index + 1}.wav`);
     });
 
     try {
-      const response = await axios.post(
-        "http://localhost:8084/api/voice-auth",
-        formData,
+      const response = await fetch(
+        "http://localhost:8084/api/voice-auth/signup",
         {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          withCredentials: true,
+          method: "POST",
+          body: formData,
         }
       );
-      console.log("Response from server:", response.data);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.message);
+        navigate("/profile"); // Use navigate to redirect after successful signup
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.detail}`);
+      }
     } catch (error) {
-      console.error("Error submitting voice authentication:", error);
+      console.error("Error submitting data:", error);
+      alert("An error occurred while submitting data.");
     }
   };
 
@@ -107,7 +116,7 @@ const SignUp = () => {
                 recording ? "bg-red-600" : "bg-blue-600 hover:bg-blue-700"
               } rounded-md text-lg font-semibold`}
             >
-              {recording ? "Stop Recording" : "authVoice"}
+              {recording ? "Stop Recording" : "Start Recording"}
             </button>
             <p className="mt-4 text-center text-gray-300">
               {prompts[promptIndex]}
