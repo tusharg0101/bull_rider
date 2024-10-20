@@ -27,11 +27,43 @@ class BullRiderApp(rumps.App):
         self.is_recording_flag = False
         self.audio_frames = []
         self.audio_thread = None
-        self.env_active = False  # To track if a tutorial session is active
+
+    def get_tutorial_state(self):
+        try:
+            response = requests.get("http://127.0.0.1:8084/tutorial_state")
+            return response.json()["tutorial_active"]
+        except Exception as e:
+            print(f"Error getting tutorial state: {str(e)}")
+            return False
+
+    def set_tutorial_state(self, state):
+        try:
+            response = requests.post("http://127.0.0.1:8084/tutorial_state", json={"state": state})
+            return response.json()["tutorial_active"]
+        except Exception as e:
+            print(f"Error setting tutorial state: {str(e)}")
+            return False
+
+    def get_current_step(self):
+        try:
+            response = requests.get("http://127.0.0.1:8084/current_step")
+            return response.json()["current_step"]
+        except Exception as e:
+            print(f"Error getting current step: {str(e)}")
+            return 0
+
+    def set_current_step(self, step):
+        try:
+            response = requests.post("http://127.0.0.1:8084/current_step", json={"step": step})
+            return response.json()["current_step"]
+        except Exception as e:
+            print(f"Error setting current step: {str(e)}")
+            return 0
 
     def start_tutorial(self, _):
-        if not self.env_active:
-            self.env_active = True
+        if not self.get_tutorial_state():
+            self.set_tutorial_state(True)
+            self.set_current_step(0)
             self.start_recording()
 
     def start_recording(self):
@@ -82,7 +114,7 @@ class BullRiderApp(rumps.App):
 
     def play_and_listen_again(self):
         try:
-            current_step = int(os.getenv('CURRENT_STEP', '0'))
+            current_step = self.get_current_step()
             output_wav_path = os.path.join(self.output_folder, f'output_{current_step}.wav')
             
             # Play the output.wav file asynchronously
@@ -102,8 +134,11 @@ class BullRiderApp(rumps.App):
             self.play_listening_sound()
 
             # Start listening for the next step
-            if self.env_active:
+            if self.get_tutorial_state():
                 self.start_recording()
+            else:
+                self.set_tutorial_state(False)
+                self.set_current_step(0)
 
         except Exception as e:
             rumps.alert(f"Error during audio playback: {str(e)}")
@@ -139,7 +174,8 @@ class BullRiderApp(rumps.App):
             self.is_recording_flag = False
             if self.audio_thread:
                 self.audio_thread.join()
-        self.env_active = False
+        self.set_tutorial_state(False)
+        self.set_current_step(0)
         rumps.quit_application()
 
     def _is_recording(self):
