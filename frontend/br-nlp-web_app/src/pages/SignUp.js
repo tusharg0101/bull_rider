@@ -1,3 +1,5 @@
+// SignUp.js
+
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import RecordRTC from "recordrtc";
@@ -16,12 +18,10 @@ const SignUp = () => {
     "Say 'Log me in' one last time",
   ];
 
-  // Handle password input
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
   };
 
-  // Start recording
   const startRecording = async () => {
     setRecording(true);
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -84,16 +84,18 @@ const SignUp = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-900 to-black text-white">
-      <div className="absolute top-4 left-4 flex items-center">
+      {/* Header with logo */}
+      <div className="absolute top-4 left-4 flex items-center space-x-2">
         <img
           src="/assets/icons/bull_icon.png"
           alt="Bull Rider Logo"
           className="h-10 w-10 mr-2"
         />
-        <h1 className="text-2xl font-bold">Bull Rider</h1>
+        <h1 className="text-2xl font-bold whitespace-nowrap">Bull Rider</h1>
       </div>
 
-      <div className="bg-white bg-opacity-10 p-8 rounded-lg shadow-lg max-w-md w-full">
+      {/* Sign-up form */}
+      <div className="bg-white bg-opacity-10 p-8 rounded-lg shadow-lg max-w-md w-full mt-20"> {/* Added margin top */}
         <h2 className="text-3xl font-semibold mb-6 text-center">Sign Up</h2>
         <div className="mb-4">
           <label className="block text-lg mb-2">Password</label>

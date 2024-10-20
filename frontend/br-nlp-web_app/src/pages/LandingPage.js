@@ -76,7 +76,7 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 text-white font-cool">
+    <div className="flex items-center justify-center min-h-screen bg-login-gradient text-white">
       <div className="max-w-md w-full bg-gray-800 p-8 rounded-lg shadow-lg transform hover:scale-105 transition duration-500 ease-in-out">
         <h1 className="text-4xl font-bold text-center mb-8 text-discord-purple">
           Bull Rider Login
@@ -84,6 +84,7 @@ const LandingPage = () => {
         <p className="text-center text-gray-300 mb-6">
           Please log in to continue.
         </p>
+        <h1 className="text-4xl font-bold text-center mb-8 text-discord-purple">Sign Up</h1>
         <div className="mb-6">
           <input
             type="password"

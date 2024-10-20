@@ -1,27 +1,32 @@
-// Header.js
-
-import React from "react";
-import { Link } from "react-router-dom";
+// src/components/Header.js
+import React from 'react';
+import { useLocation, Link } from 'react-router-dom';
 
 const Header = () => {
+  const location = useLocation();
+
+  // Exclude the header from these paths
+  const excludedPaths = ["/signup", "/login"];
+  const showHeader = !excludedPaths.includes(location.pathname);
+
+  // Show the login button only on the home page and not on the login screen
+  const showLoginButton = location.pathname === "/";
+
+  // If the header shouldn't be shown, return null
+  if (!showHeader) return null;
+
   return (
-    <nav className="bg-black bg-opacity-70 backdrop-blur-sm text-white p-4 shadow-lg fixed w-full top-0 z-50">
-      <div className="container mx-auto flex justify-between items-center">
-        <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">
-          Bull Rider
-        </h1>
-        <ul className="flex space-x-6">
-          <li>
-            <Link
-              to="/login"
-              className="hover:text-blue-400 text-lg transition duration-300"
-            >
-              Log In
-            </Link>
-          </li>
-        </ul>
-      </div>
-    </nav>
+    <header className="flex justify-between p-4 bg-gray-800 text-white">
+      <h1 className="text-xl">Bull Rider</h1>
+      {/* Only show the login button on the home page */}
+      {showLoginButton && (
+        <Link to="/login">
+          <button className="bg-discord-purple px-4 py-2 rounded-md hover:bg-discord-blue">
+            Login
+          </button>
+        </Link>
+      )}
+    </header>
   );
 };
 
